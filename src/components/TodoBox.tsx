@@ -2,8 +2,9 @@ import { Button, FormControl, List, TextField } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { makeStyles } from '@material-ui/core';
-import TaskItem from './TaskItem';
 import TodoForm from './TodoForm';
+import { useData } from '../hooks/useData';
+import TodoItem from './TodoItem';
 
 const useStyles = makeStyles({
   list: {
@@ -12,12 +13,13 @@ const useStyles = makeStyles({
 });
 
 const TodoBox: React.FC = () => {
-  const [tasks, setTasks] = useState([{ id: '', title: '', done: false }]);
+  // const [todos, setTodos] = useData();
+  const { todos, setTodos, toggleComplete, removeData } = useData();
 
   const classes = useStyles();
   useEffect(() => {
     const unSubscribe = db.collection('tasks').onSnapshot((snapshot) => {
-      setTasks(
+      setTodos(
         snapshot.docs.map((doc) => ({
           id: doc.id,
           title: doc.data().title,
@@ -31,8 +33,15 @@ const TodoBox: React.FC = () => {
   return (
     <React.Fragment>
       <List className={classes.list}>
-        {tasks.map((task) => (
-          <TaskItem key={task.id} id={task.id} title={task.title} done={task.done} />
+        {todos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            id={todo.id}
+            title={todo.title}
+            done={todo.done}
+            toggleComplete={toggleComplete}
+            onRemove={removeData}
+          />
         ))}
       </List>
       <TodoForm />

@@ -1,6 +1,6 @@
 import { Button, FormControl, IconButton, Input, InputAdornment, InputLabel } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { auth } from '../firebase';
 
@@ -19,6 +19,13 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   });
 
   const [useLogin, setUseLogin] = useState(true);
+
+  useEffect(() => {
+    const unSub = auth.onAuthStateChanged((user) => {
+      user && props.history.push('/');
+    });
+    return () => unSub();
+  }, []);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
